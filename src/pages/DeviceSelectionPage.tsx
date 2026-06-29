@@ -10,8 +10,10 @@ const pageItems = [1, 2, 3, 4, 5]
 export function DeviceSelectionPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const initialPrimary = getPrimaryIndex(searchParams.get('primary'))
-  const initialSecondary = getSecondaryIndex(initialPrimary, searchParams.get('secondary'))
+  const primaryParam = searchParams.get('primary')
+  const secondaryParam = searchParams.get('secondary')
+  const initialPrimary = getPrimaryIndex(primaryParam)
+  const initialSecondary = getSecondaryIndex(initialPrimary, secondaryParam)
   const [activePrimary, setActivePrimary] = useState(initialPrimary)
   const [activeSecondary, setActiveSecondary] = useState(initialSecondary)
   const activeMenu = categoryMenus[activePrimary]
@@ -19,11 +21,11 @@ export function DeviceSelectionPage() {
   const activeSecondaryName = secondaryItems[activeSecondary] || secondaryItems[0] || ''
 
   useEffect(() => {
-    const nextPrimary = getPrimaryIndex(searchParams.get('primary'))
-    const nextSecondary = getSecondaryIndex(nextPrimary, searchParams.get('secondary'))
+    const nextPrimary = getPrimaryIndex(primaryParam)
+    const nextSecondary = getSecondaryIndex(nextPrimary, secondaryParam)
     setActivePrimary(nextPrimary)
     setActiveSecondary(nextSecondary)
-  }, [searchParams])
+  }, [primaryParam, secondaryParam])
 
   function syncSelection(primaryIndex: number, secondaryIndex: number) {
     const primary = categoryMenus[primaryIndex]

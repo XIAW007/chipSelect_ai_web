@@ -1,6 +1,6 @@
 import { Sparkles } from 'lucide-react'
 import type { FormEvent } from 'react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { AiConversationResults } from '../components/mall-search/AiConversationResults'
 import type { AiMessage } from '../components/mall-search/AiConversationResults'
@@ -17,6 +17,7 @@ export function SearchResultPage() {
   const [messages, setMessages] = useState<AiMessage[]>([])
   const [pendingReply, setPendingReply] = useState('')
   const [streamingText, setStreamingText] = useState('')
+  const initializedAiQueryRef = useRef<string | null>(null)
   const shownProducts = useMemo(() => mallProducts, [])
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
@@ -58,9 +59,11 @@ export function SearchResultPage() {
   }
 
   useEffect(() => {
-    if (searchMode !== 'ai' || messages.length > 0 || pendingReply || streamingText) return
-    setPendingReply(buildAiReply(keyword.trim() || query))
-  }, [keyword, messages.length, pendingReply, query, searchMode, streamingText])
+    const initialQuestion = query
+    if (searchMode !== 'ai' || initializedAiQueryRef.current === initialQuestion) return
+    initializedAiQueryRef.current = initialQuestion
+    sendAiMessage(initialQuestion)
+  }, [query, searchMode])
 
   useEffect(() => {
     if (!pendingReply) return
